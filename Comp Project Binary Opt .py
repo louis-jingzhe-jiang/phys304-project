@@ -34,6 +34,10 @@ def decode(NL, NR, k, s):
 
     return odor_guess, sense_mat, odor_vec.T, recep_vec
 
+def estpc(Nr,k,s):
+    alpha = k/NL
+    return (alpha+(1-alpha)*(1-(1-s*(1-s*alpha)**(NL-1))**Nr))**NL
+'''
 # Parameters
 NL = 10000
 k = 10
@@ -47,6 +51,7 @@ errs = []
 # Efficient simulation loop
 probs=[]
 for NR in NR_values:
+    print(NR)
     trial_accuracies = np.zeros(10)
     for trial in range(10):
         correct = 0
@@ -57,38 +62,43 @@ for NR in NR_values:
     mean_probs.append(np.mean(trial_accuracies))
     errs.append(np.std(trial_accuracies))
 
+
 # Plot
-plt.errorbar(NR_values, mean_probs, yerr=errs, fmt='o', capsize=4)
+plt.plot(NR_values,estpc(NR_values,k,s))
+plt.errorbar(NR_values, mean_probs, yerr=errs, fmt='o', markersize=3, capsize=4)
 plt.xlabel("Number of Receptors (NR)")
 plt.ylabel("Decoding Accuracy")
 plt.title("Efficient Sparse Odor Decoding vs. Receptor Count")
 plt.grid(True)
 plt.tight_layout()
 plt.show()
-
 '''
+
+def phalf(s):
+    return -(-4.61486830584+np.log(1/s))/s
+
 NR = 1000
 NL = 100000
-k_vals = np.arange(1,50,2)
-print(len(k_vals))
-s_vals = np.linspace(0.01,0.1,25)
-probs=np.zeros((25,25))
+k_vals = np.arange(1,50,1)
+s_vals = np.linspace(0.01,0.1,49)
+probs=np.zeros((49,49))
 sNRs = []
+ESTs = []
 
 for i,S in enumerate(s_vals):
-    print(S)
     sNRs.append(S*NR)
+    ESTs.append(phalf(S))
+    print(k_vals[i])
     for j,K in enumerate(k_vals):
-        print(K)
         correct = 0
-        for _ in range(5):
+        for _ in range(10):
             odor_guess, _, odor_vec, _ = decode(NL, NR, K, S)
             correct += np.array_equal(odor_guess, odor_vec)
         probs[j][i]=(correct/100)
+plt.plot(sNRs, ESTs,color='w')
 plt.contourf(sNRs, k_vals, probs, levels=50, cmap='viridis')
 plt.colorbar(label='P(c=c)')
 plt.xlabel('s*NR')
 plt.ylabel('K')
 plt.show()
-'''
 

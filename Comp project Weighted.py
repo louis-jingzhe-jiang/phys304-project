@@ -54,6 +54,7 @@ def weighted_decode(NL,NR,k,s):
 odor_guess,sense_mat,odor_vec,recep_vec = weighted_decode(10000,500,10,0.05)
 
 
+
 # Parameters
 NL = 10000
 k = 10
@@ -76,7 +77,11 @@ for NR in NR_values:
     mean_probs.append(np.mean(trial_accuracies))
     errs.append(np.std(trial_accuracies))
 
+def exppc(Nr):
+    return
+
 # Plot
+
 plt.errorbar(NR_values, mean_probs, yerr=errs, fmt='o', capsize=4)
 plt.xlabel("Number of Receptors (NR)")
 plt.ylabel("Decoding Accuracy")
@@ -84,3 +89,29 @@ plt.title("Efficient Sparse Odor Decoding vs. Receptor Count")
 plt.grid(True)
 plt.tight_layout()
 plt.show()
+
+
+'''
+NR = 1000
+NL = 100000
+k_vals = np.arange(1,50,1)
+s_vals = np.linspace(0.01,0.1,49)
+probs=np.zeros((49,49))
+sNRs = []
+
+for i,S in enumerate(s_vals):
+    print(k_vals[i])
+    sNRs.append(S*NR)
+    for j,K in enumerate(k_vals):
+        correct = 0
+        for _ in range(10):
+            odor_guess, _, odor_vec, _ = weighted_decode(NL, NR, K, S)
+            if odor_guess.shape == odor_vec.shape:
+                correct += np.allclose(odor_guess, odor_vec, atol=1e-7)
+        probs[j][i]=(correct/100)
+plt.contourf(sNRs, k_vals, probs, levels=50, cmap='viridis')
+plt.colorbar(label='P(c=c)')
+plt.xlabel('s*NR')
+plt.ylabel('K')
+plt.show()
+'''
