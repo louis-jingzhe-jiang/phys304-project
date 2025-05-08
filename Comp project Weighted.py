@@ -88,10 +88,11 @@ plt.ylabel("Decoding Accuracy")
 plt.title("Efficient Sparse Odor Decoding vs. Receptor Count")
 plt.grid(True)
 plt.tight_layout()
+plt.savefig("weighted1")
 plt.show()
 
 
-'''
+
 NR = 1000
 NL = 100000
 k_vals = np.arange(1,50,1)
@@ -113,5 +114,6 @@ plt.contourf(sNRs, k_vals, probs, levels=50, cmap='viridis')
 plt.colorbar(label='P(c=c)')
 plt.xlabel('s*NR')
 plt.ylabel('K')
+plt.savefig("weighted2")
 plt.show()
-'''
+

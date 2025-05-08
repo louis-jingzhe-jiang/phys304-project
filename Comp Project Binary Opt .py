@@ -37,7 +37,7 @@ def decode(NL, NR, k, s):
 def estpc(Nr,k,s):
     alpha = k/NL
     return (alpha+(1-alpha)*(1-(1-s*(1-s*alpha)**(NL-1))**Nr))**NL
-'''
+
 # Parameters
 NL = 10000
 k = 10
@@ -71,8 +71,9 @@ plt.ylabel("Decoding Accuracy")
 plt.title("Efficient Sparse Odor Decoding vs. Receptor Count")
 plt.grid(True)
 plt.tight_layout()
+plt.savefig("binary1")
 plt.show()
-'''
+
 
 def phalf(s):
     return -(-4.61486830584+np.log(1/s))/s
@@ -100,5 +101,6 @@ plt.contourf(sNRs, k_vals, probs, levels=50, cmap='viridis')
 plt.colorbar(label='P(c=c)')
 plt.xlabel('s*NR')
 plt.ylabel('K')
+plt.savefig("binary2")
 plt.show()
 
