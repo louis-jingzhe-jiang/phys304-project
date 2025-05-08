@@ -89,8 +89,9 @@ ESTs = []
 for i,S in enumerate(s_vals):
     sNRs.append(S*NR)
     ESTs.append(phalf(S))
-    print(k_vals[i])
+    print(f"Working on {i+1}/{len(s_vals)}")
     for j,K in enumerate(k_vals):
+        print(f"\tWorking on {j+1}/{len(k_vals)}")
         correct = 0
         for _ in range(10):
             odor_guess, _, odor_vec, _ = decode(NL, NR, K, S)
