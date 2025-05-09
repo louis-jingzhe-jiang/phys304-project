@@ -8,7 +8,7 @@ Created on Fri Apr 25 23:10:57 2025
 
 import numpy as np
 import matplotlib.pyplot as plt
-
+  
 def make_sense_mat(NL, NR, k, s):
     # Vectorized odor vector creation
     odor_vec = np.zeros((NL, 1))
