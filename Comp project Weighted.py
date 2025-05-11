@@ -2,6 +2,19 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri Apr 25 21:40:52 2025
+This notebook defined a computational model for the olfactory system by reducing the concentration of odorants
+in an odor mixture to deminal values between 0 and 1 and also reducing the bonding affinity of olfactory
+receptors into deminal values between 0 and 1, making the algorithm similar to the binary case but with weights. within the notebook, 
+there is an encoding process, which creates a random odor vector and sensing matrix to mimic an odor mixture and random
+array of odorants that can bind to different receptors.  This encoding process then creates the vector representing
+the response of the olfactory receptors. This notbook also defines a decoding process in which the receptor vector and 
+sensing matrix are used to work backwards and create an estimate of the original odor mixture vector. The guess is then compared
+to the original vector. Using these functions, the notebook graphs the dependence of decoding accuracy on the number of 
+receptors and then also the dependence of decoding accuracy on the number of odorants per odor and average number of odorants
+responding to a receptor.
+
+To run the notebook, simply hit the SHIFT and ENTER keys together. *Note: the code takes a considerable amount of time.
+    
 
 @author: willmurdock
 """
@@ -37,51 +50,64 @@ def weighted_decode(NL,NR,k,s):
     inactive_receptors = np.where(recep_vec == 0)[0]
     if len(inactive_receptors) > 0:
         
+        #finding the location of the odorants in the rows corresponding to inactive receptors
         zero_out = np.any(sense_mat[inactive_receptors] > 0, axis=0)
+        
+        #finding the indices of the columns that should remain in the matrix
         active_cols = ~zero_out
+        
+        #finding the indices of the rows that should remain in the matrix
         active_rows = np.ones(sense_mat.shape[0], dtype=bool)
         active_rows[inactive_receptors] = False
         
+        #removing the inaftive receptor rows and the odorants that we know are not present from the matrix
         sense_mat_new = sense_mat[active_rows][:, active_cols]
         
+        #removing the inactive receptors
         recep_vec_new = recep_vec[active_rows]
         
+        #using pseudo inverse to solve the linear equations that our new matrix and receptor vectors give us
         odor_guess = np.linalg.pinv(sense_mat_new) @ recep_vec_new
+        
+        #removing elements of the original odor that are zero in order to compare the odor guess to the original more easily
         odor_vec=odor_vec[odor_vec != 0]
         
     return odor_guess.reshape(-1,1),sense_mat,odor_vec.reshape(-1,1),recep_vec
 
-odor_guess,sense_mat,odor_vec,recep_vec = weighted_decode(10000,500,10,0.05)
-
-
-
-# Parameters
+#Defining parameters
 NL = 10000
 k = 10
 s = 0.05
 NR_values = np.arange(100, 600, 10)
 
+#making lists for success probabilities and the error on the measurements
 mean_probs = []
 errs = []
 
-probs=[]
 for NR in NR_values:
     trial_accuracies = np.zeros(10)
+    
+    
     for trial in range(10):
+        
+        #defining a value to record number of successful trials
         correct = 0
+        
         for _ in range(100):
             odor_guess, sense_mat, odor_vec, recep_vec = weighted_decode(NL, NR, k, s)
             if odor_guess.shape == odor_vec.shape:
+                
+                #updating whether or not the decoding was accurate
                 correct += np.allclose(odor_guess, odor_vec, atol=1e-7)
+                
+        #finding the mean accuracy for the trials
         trial_accuracies[trial] = correct / 100
     mean_probs.append(np.mean(trial_accuracies))
+    
+    #using the 10 simulations to get an error bar
     errs.append(np.std(trial_accuracies))
 
-def exppc(Nr):
-    return
-
-# Plot
-
+#plotting the decoding accuracy against the NR values
 plt.errorbar(NR_values, mean_probs, yerr=errs, fmt='o', capsize=4)
 plt.xlabel("Number of Receptors (NR)", fontsize=15)
 plt.ylabel("Decoding Accuracy", fontsize=15)
@@ -92,29 +118,43 @@ plt.savefig("weighted1")
 plt.show()
 
 
-"""
+#defining parameters
 NR = 1000
 NL = 100000
+
+#making values for k and s to iterate through
 k_vals = np.arange(1,50,1)
 s_vals = np.linspace(0.01,0.1,49)
 probs=np.zeros((49,49))
+
+#making blank lists for s*NR values
 sNRs = []
 
+#iterating through the s and v value lists
 for i,S in enumerate(s_vals):
+    
+    #printing the values of k to let the user know the progress of the data making process
     print(k_vals[i])
+    
+    
     sNRs.append(S*NR)
     for j,K in enumerate(k_vals):
+        
+        #defining a value to record number of successful trials
         correct = 0
+        
+        #averaging the success of the decoding algorithm for 10 trials at each value of k and s
         for _ in range(10):
             odor_guess, _, odor_vec, _ = weighted_decode(NL, NR, K, S)
             if odor_guess.shape == odor_vec.shape:
+                #updating the success based on whether or not the decoding was accurate for the trial
                 correct += np.allclose(odor_guess, odor_vec, atol=1e-7)
         probs[j][i]=(correct/100)
+        
+#plotting the data
 plt.contourf(sNRs, k_vals, probs, levels=50, cmap='viridis')
 plt.colorbar(label='P(c=c)')
 plt.xlabel('s*NR')
 plt.ylabel('K')
 plt.savefig("weighted2")
 plt.show()
-
-"""
