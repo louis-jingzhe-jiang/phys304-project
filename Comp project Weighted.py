@@ -83,16 +83,16 @@ def exppc(Nr):
 # Plot
 
 plt.errorbar(NR_values, mean_probs, yerr=errs, fmt='o', capsize=4)
-plt.xlabel("Number of Receptors (NR)")
-plt.ylabel("Decoding Accuracy")
-plt.title("Efficient Sparse Odor Decoding vs. Receptor Count")
+plt.xlabel("Number of Receptors (NR)", fontsize=15)
+plt.ylabel("Decoding Accuracy", fontsize=15)
+plt.title("Efficient Sparse Odor Decoding vs. Receptor Count", fontsize=17)
 plt.grid(True)
 plt.tight_layout()
 plt.savefig("weighted1")
 plt.show()
 
 
-
+"""
 NR = 1000
 NL = 100000
 k_vals = np.arange(1,50,1)
@@ -117,3 +117,4 @@ plt.ylabel('K')
 plt.savefig("weighted2")
 plt.show()
 
+"""
